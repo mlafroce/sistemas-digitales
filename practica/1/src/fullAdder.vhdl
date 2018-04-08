@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-entity fullAdder is
+entity full_adder is
   port (
     a : in std_logic;
     b : in std_logic;
@@ -9,9 +9,9 @@ entity fullAdder is
     sum : out std_logic;
     cout : out std_logic
   );
-end fullAdder;
+end full_adder;
 
-architecture behaviour of fullAdder is
+architecture behaviour of full_adder is
 begin
   -- sum
   sum <= a xor b xor cin;

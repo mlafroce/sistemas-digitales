@@ -1,10 +1,10 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-entity fullAdderTest is
+entity full_adder_test is
 end;
 
-architecture behaviour of fullAdderTest is
+architecture behaviour of full_adder_test is
 
 signal a_t : std_logic := '0';
 signal b_t : std_logic := '0';
@@ -12,7 +12,7 @@ signal cin_t : std_logic := '0';
 signal sum_t : std_logic;
 signal cout_t : std_logic;
 
-component fullAdder is
+component full_adder is
   port (
     a : in std_logic;
     b : in std_logic;
@@ -20,11 +20,11 @@ component fullAdder is
     sum : out std_logic;
     cout : out std_logic
   );
-end component fullAdder;
+end component full_adder;
 
 begin
   -- Instanciacion del componente a probar
-  fullAdderInst: fullAdder
+  fullAdderInst: full_adder
     port map(
       a => a_t,
       b => b_t,
