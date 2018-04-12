@@ -1,7 +1,7 @@
 SRCS ?= $(wildcard *.vhdl)
 OBJS = $(patsubst %.vhdl,%,$(SRCS))
-MAIN = bcd_to_7seg
-SIM_TIME = 100ns
+MAIN = bcd_counter_test
+SIM_TIME = 200ns
 
 all: compile run
 
