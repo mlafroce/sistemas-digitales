@@ -7,22 +7,34 @@ entity bcd_counter is
     clk_i : in std_logic;
     en_i : in std_logic;
     rst_i : in std_logic;
-    cnt_o : out std_logic_vector(3 downto 0)
+    cnt_o : out std_logic_vector(3 downto 0);
+    carry_o : out std_logic
   );
 end bcd_counter;
 
 architecture behaviour of bcd_counter is
 begin
 
-process (en_i)
+process (clk_i)
 variable count_v: integer := 0;
 begin
-    if rising_edge(en_i) then
-        count_v := count_v + 1;
-        if count_v = 10 then
-            count_v := 0;
-        end if;
-    end if;
+    if rising_edge(clk_i) then
+        if en_i = '1' then
+            count_v := count_v + 1;
+
+            if count_v = 9 then
+                carry_o <= '1';
+            end if;
+
+            if count_v = 10 then
+                count_v := 0;
+            end if; -- end if count
+
+        else -- else if en_i = '0'
+            carry_o <= '0';    
+        end if; -- end if en_i
+        
+    end if; -- clk_i
     cnt_o <= std_logic_vector(to_unsigned(count_v, cnt_o'length));
 
 end process;
