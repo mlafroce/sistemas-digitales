@@ -35,13 +35,13 @@ endif
 
 SIM = ghdl
 
-SRCS = bcd_to_7seg.vhdl
+SRCS = enable_gen.vhdl
 
-SRCS_FILES := $(addprefix $(WPWD)/../src/,$(SRCS))
+SRCS_FILES := $(addprefix $(WPWD)/../../src/,$(SRCS))
 VHDL_SOURCES = $(SRCS_FILES)
 
-TOPLEVEL := bcd_to_7seg
-MODULE   := bcdTo7seg_tb
+TOPLEVEL := enable_gen
+MODULE   := enableGen_tb
 
 include $(COCOTB)/makefiles/Makefile.inc
 include $(COCOTB)/makefiles/Makefile.sim
