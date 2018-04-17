@@ -11,8 +11,6 @@ def enable_gen_test(dut):
     # Inicializo un clock
     cocotb.fork(Clock(dut.clk_i, 100, units='ns').start())
     # Ejecuto N ciclos del reloj y comparo la salida en cada uno de ellos
-    # Hay un par de ciclos para que el componente inicie, dado que el primer enable aparece apagado
-    counter = 0
     for i in range(1, TEST_CYCLES):
         enableExpected = int(i % ENABLE_DIV == 0)
         yield RisingEdge(dut.clk_i)

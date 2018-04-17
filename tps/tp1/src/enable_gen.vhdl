@@ -3,6 +3,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity enable_gen is
+  generic (ENABLE_DIV: integer := 100);
   port (
     clk_i : in std_logic;
     en_o : out std_logic := '0'
@@ -10,9 +11,6 @@ entity enable_gen is
 end enable_gen;
 
 architecture behaviour of enable_gen is
-
-constant ENABLE_DIV : integer := 100;
-
 begin
 
 process (clk_i)
