@@ -26,7 +26,7 @@ architecture behaviour of display_controller is
   );
 
   enable_generator: enable_gen
-    generic map (ENABLE_DIV)
+    generic map (DISPLAY_ENABLE_DIV)
     port map (
     clk_i,
     enable_gen_o

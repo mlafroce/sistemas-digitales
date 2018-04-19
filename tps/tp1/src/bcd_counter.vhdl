@@ -31,8 +31,12 @@ begin
             end if; -- end if count
 
         else -- else if en_i = '0'
-            carry_o <= '0';    
+            carry_o <= '0';
         end if; -- end if en_i
+        if rst_i = '1' then
+            count_v := 0;
+            carry_o <= '0';
+        end if; -- rst_i
         
     end if; -- clk_i
     cnt_o <= std_logic_vector(to_unsigned(count_v, cnt_o'length));
