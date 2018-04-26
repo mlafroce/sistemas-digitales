@@ -15,17 +15,19 @@ architecture behaviour of counter_2bit is
 begin
 
 process (clk_i)
-variable count_v: integer := 0;
+variable count_v: integer range 0 to 4 := 0;
 begin
     if rising_edge(clk_i) then
         if en_i = '1' then
             count_v := count_v + 1;
-
             if count_v = 4 then
                 count_v := 0;
-            end if; -- end if count
-               
+            end if; -- end if count       
         end if; -- end if en_i
+        
+        if rst_i = '1' then
+            count_v := 0;
+        end if; -- end if rst_i
         
     end if; -- clk_i
     cnt_o <= std_logic_vector(to_unsigned(count_v, cnt_o'length));

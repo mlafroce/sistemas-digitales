@@ -5,10 +5,11 @@ MODEL_SRCS_FULL = $(patsubst %,$(MODEL_PATH)/%,$(MODEL_SRCS))
 TEST_SRCS ?= $(wildcard *.vhdl)
 OBJS = $(patsubst %.vhdl,%,$(MODEL_SRCS_FULL))
 TEST_OBJS = $(patsubst %.vhdl,%,$(TEST_SRCS))
-MAIN ?= bcd_counter_test
+#MAIN ?= bcd_counter_test
 #MAIN ?= display_controller_test
+MAIN ?= main_test
 
-SIM_TIME = 1000ns
+SIM_TIME = 500us
 
 SRCS = $(MODEL_SRCS_FULL) $(TEST_SRCS)
 

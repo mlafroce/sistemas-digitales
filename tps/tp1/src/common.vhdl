@@ -5,8 +5,8 @@ package common is
   -- Types
   type bcd_array is array (0 to 3) of std_logic_vector(0 to 3);
   -- Constants
-  constant DISPLAY_ENABLE_DIV : integer := 100;
-  constant BCD_ENABLE_DIV : integer := 1000;
+  constant DISPLAY_ENABLE_DIV : integer := 50000;
+  constant BCD_ENABLE_DIV : integer := 10E6;
   -- Components
   component bcd_counter is
   port (
@@ -74,5 +74,13 @@ package common is
   );
   end component display_controller;
 
+  component tp is
+  port(
+    clk_i: in std_logic;
+    rst_i: in std_logic;
+    seg_o: out std_logic_vector(0 to 6);
+    anodos_o: out std_logic_vector(0 to 3)
+  );
+  end component tp;
   -- End
 end common;

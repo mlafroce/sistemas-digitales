@@ -6,16 +6,16 @@ entity display_controller is
   port (
     clk_i : in std_logic;
     bcd_i : in bcd_array;
-    seg_o : out std_logic_vector(0 to 6);
-    anodos_o : out std_logic_vector(0 to 3)
+    seg_o : out std_logic_vector(0 to 6) := "0000000";
+    anodos_o : out std_logic_vector(0 to 3) := "0000"
   );
 end display_controller;
 
 architecture behaviour of display_controller is
 
-  signal counter_o : std_logic_vector(0 to 1);
-  signal enable_gen_o : std_logic;
-  signal current_bcd : std_logic_vector (0 to 3);
+  signal counter_o : std_logic_vector(0 to 1) := "00";
+  signal enable_gen_o : std_logic := '0';
+  signal current_bcd : std_logic_vector (0 to 3) := "0000";
 
   begin
   counter: counter_2bit port map(

@@ -22,11 +22,8 @@ begin
         if en_i = '1' then
             count_v := count_v + 1;
 
-            if count_v = 9 then
-                carry_o <= '1';
-            end if;
-
             if count_v = 10 then
+                carry_o <= '1';
                 count_v := 0;
             end if; -- end if count
 
