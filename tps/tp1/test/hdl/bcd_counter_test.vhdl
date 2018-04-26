@@ -42,13 +42,13 @@ begin
 
   process
   begin
-  en_t <= '1' after 45 ns, '0' after 55 ns;
-  wait for 60 ns;
+  en_t <= '1' after 20 ns, '0' after 30 ns;
+  wait for 40 ns;
   end process;
 
   process
   begin
-  rst_t <= '1' after 300 ns, '0' after 310 ns;
-  wait for 310 ns;
+  rst_t <= '1' after 440 ns, '0' after 460 ns;
+  wait for 500 ns;
   end process;
 end behaviour;

@@ -16,11 +16,11 @@ process (selector_i)
 begin
     case selector_i is
         --                       abcdefg
-        when "00" => output_o <= "0001";
-        when "01" => output_o <= "0010";
-        when "10" => output_o <= "0100";
-        when "11" => output_o <= "1000";
-        when others => output_o <= "0001";
+        when "00" => output_o <= "0111";
+        when "01" => output_o <= "1011";
+        when "10" => output_o <= "1101";
+        when "11" => output_o <= "1110";
+        when others => output_o <= "1111";
     end case;
 
 end process;
