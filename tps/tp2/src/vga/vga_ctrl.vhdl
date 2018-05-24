@@ -29,7 +29,6 @@ architecture vga_ctrl_arch of vga_ctrl is
   signal video_on: std_logic := '1';
 
 begin
-
   -- instanciacion del controlador VGA
   vga_sync_unit: entity work.vga_sync
     port map(

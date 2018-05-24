@@ -27,16 +27,15 @@ end gen_pixels;
 architecture gen_pixels_arch of gen_pixels is
 
   signal rgb_s, char_s: std_logic_vector(2 downto 0);
-  signal index_s: bcd_array;
 
 begin
   char_mapper_inst : char_mapper port map(
-    bcd_i => index_s,
+    bcd_i => bcd_i,
     pixel_x_i => pixel_x_i,
     pixel_y_i => pixel_y_i,
     rgb_o => char_s
   );
-  process(clk_i, rst_i)
+  process(clk_i, rst_i, bcd_i)
   begin
   if rst_i = '1' then
       rgb_s <= (others => '0');

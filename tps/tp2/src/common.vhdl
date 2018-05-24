@@ -8,7 +8,6 @@ package common is
   type pixel_pos is array(9 downto 0) of std_logic;
 
   -- Constants
-  constant DISPLAY_ENABLE_DIV : integer := 50000;
   constant BCD_ENABLE_DIV : integer := 10E6;
 
   -- Components
@@ -52,6 +51,24 @@ package common is
     rom_o: out std_logic
   );
   end component char_rom;
+
+  component bcd_counter is
+  port (
+    clk_i : in std_logic;
+    en_i : in std_logic;
+    rst_i : in std_logic;
+    cnt_o : out std_logic_vector(3 downto 0);
+    carry_o : out std_logic
+  );
+  end component bcd_counter;
+  
+  component enable_gen is
+  generic (ENABLE_DIV: integer);
+  port (
+    clk_i : in std_logic;
+    en_o : out std_logic := '0'
+  );
+  end component enable_gen;
 
   -- End
 end common;

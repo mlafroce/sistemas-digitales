@@ -22,7 +22,14 @@ entity tp2 is
 end tp2;
 
 architecture behaviour of tp2 is
-signal bcd_s : bcd_array := ("0000","0001","0010","0011");
+signal bcd_s : bcd_array;
+signal bcd_carry_o_s : std_logic_vector(0 to 3) := "0000";
+signal en_s : std_logic := '0';
+signal bcd0_debug : std_logic_vector(3 downto 0) := bcd_s(0);
+signal bcd1_debug : std_logic_vector(3 downto 0) := bcd_s(1);
+signal bcd2_debug : std_logic_vector(3 downto 0) := bcd_s(2);
+signal bcd3_debug : std_logic_vector(3 downto 0) := bcd_s(3);
+signal en_debug : std_logic := en_s;
 
 begin
   -- Instanciacion del componente a probar
@@ -35,4 +42,23 @@ begin
     vsync_o => vga_vsync_o,
     rgb_o => vga_rgb_o
   );
+  enable_generator: enable_gen
+    generic map (10)
+    port map (
+    clk_i,
+    en_s
+  );
+
+  counter_g: for I in 0 to 3 generate
+    bcd0: if I=0 generate
+      bcd0inst: bcd_counter port map
+         (clk_i, en_s, rst_i, bcd_s(I), bcd_carry_o_s(I));
+    end generate bcd0;
+
+    bcdX: if I>0 generate
+      bcdXinst: bcd_counter port map
+        (clk_i, bcd_carry_o_s(I-1), rst_i, bcd_s(I), bcd_carry_o_s(I));
+    end generate bcdX;
+
+  end generate counter_g;
 end behaviour;

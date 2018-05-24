@@ -16,17 +16,28 @@ architecture behaviour of char_mapper is
 
   signal char_s: std_logic;
   signal index_s: std_logic_vector(3 downto 0);
+  signal bcd0_debug : std_logic_vector(3 downto 0) := bcd_i(0);
+  signal bcd1_debug : std_logic_vector(3 downto 0) := bcd_i(1);
+  signal bcd2_debug : std_logic_vector(3 downto 0) := bcd_i(2);
+  signal bcd3_debug : std_logic_vector(3 downto 0) := bcd_i(3);
 
 begin
   char_rom_inst : char_rom port map(
       char_idx_i => index_s,
-      font_row_i => pixel_x_i(2 downto 0),
-      font_col_i => pixel_y_i(2 downto 0),
+		font_col_i => pixel_x_i(2 downto 0),
+      font_row_i => pixel_y_i(2 downto 0),
       rom_o => char_s
     );
-  process (pixel_x_i, pixel_y_i)
+  process(bcd_i)
+  begin
+  bcd0_debug <= bcd_i(0);
+  bcd1_debug <= bcd_i(1);
+  bcd2_debug <= bcd_i(2);
+  bcd3_debug <= bcd_i(3);
+  end process;
+  process (pixel_x_i, pixel_y_i, bcd_i, char_s)
     begin
-      if to_integer(unsigned(pixel_y_i)) >= 300 and to_integer(unsigned(pixel_y_i)) < 308 then
+      if to_integer(unsigned(pixel_y_i)) >= 296 and to_integer(unsigned(pixel_y_i)) < 314 then
         case to_integer(unsigned(pixel_x_i)) is
           when 320 to 327 => index_s <= bcd_i(0);
           when 328 to 335 => index_s <= bcd_i(1);

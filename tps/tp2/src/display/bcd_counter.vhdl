@@ -16,7 +16,7 @@ architecture behaviour of bcd_counter is
 begin
 
 process (clk_i)
-variable count_v: integer := 0;
+variable count_v: integer range 0 to 10 := 0;
 begin
     if rising_edge(clk_i) then
         if en_i = '1' then
