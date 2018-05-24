@@ -6,3 +6,9 @@ env.sh
 
 sim_build
 clases
+
+#Quartus
+db
+incremental_db
+output_files
+*.bak

@@ -2,85 +2,56 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 
 package common is
+
   -- Types
   type bcd_array is array (0 to 3) of std_logic_vector(0 to 3);
+  type pixel_pos is array(9 downto 0) of std_logic;
+
   -- Constants
   constant DISPLAY_ENABLE_DIV : integer := 50000;
   constant BCD_ENABLE_DIV : integer := 10E6;
+
   -- Components
-  component bcd_counter is
-  port (
-    clk_i : in std_logic;
-    en_i : in std_logic;
-    rst_i : in std_logic;
-    cnt_o : out std_logic_vector(3 downto 0);
-    carry_o : out std_logic
+  component gen_pixels is
+    port(
+      clk_i, rst_i: in std_logic;
+      bcd_i: in bcd_array;
+      pixel_x_i, pixel_y_i : in std_logic_vector(9 downto 0);
+      ena_i: in std_logic;
+      rgb_o : out std_logic_vector(2 downto 0)
   );
-  end component bcd_counter;
+  end component gen_pixels;
 
-  component bcd_to_7seg is
+  component vga_ctrl is
+    port(
+      clk_i, rst_i: in std_logic;
+      bcd_i: in bcd_array;
+      hsync_o , vsync_o : out std_logic;
+      rgb_o : out std_logic_vector(2 downto 0)
+  );
+  end component vga_ctrl;
+
+  component char_mapper is
     port (
-      bcd_i : in std_logic_vector(0 to 3);
-      seg_o : out std_logic_vector(0 to 6)
-    );
-  end component bcd_to_7seg;
-
-  component counter_2bit is
-  port (
-    clk_i : in std_logic;
-    en_i : in std_logic;
-    rst_i : in std_logic;
-    cnt_o : out std_logic_vector(1 downto 0)
+    bcd_i: in bcd_array;
+    pixel_x_i : in std_logic_vector(9 downto 0);  -- posicion horizontal del pixel
+    pixel_y_i : in std_logic_vector(9 downto 0);  -- posicion vertical del pixel
+    rgb_o : out std_logic_vector(2 downto 0)
   );
-  end component counter_2bit;
+  end component char_mapper;
 
-  component deco_2to4 is
-  port (
-    selector_i : in std_logic_vector(0 to 1);
-    output_o : out std_logic_vector(0 to 3)
+  component char_rom is
+  generic(
+    N: integer:= 6;
+    M: integer:= 3;
+    W: integer:= 8
   );
-  end component deco_2to4;
-
-  component enable_gen is
-  generic (ENABLE_DIV: integer);
-  port (
-    clk_i : in std_logic;
-    en_o : out std_logic := '0'
-  );
-  end component enable_gen;
-
-  component mux_4to1 is
-  port (
-    selector_i : in std_logic_vector(0 to 1);
-    input_i : in std_logic_vector(0 to 3);
-    output_o : out std_logic
-  );
-  end component mux_4to1;
-
-  component mux_16to4 is
-    port (
-      selector_i : in std_logic_vector(0 to 1);
-      input_i : in bcd_array;
-      output_o : out std_logic_vector(0 to 3)
-    );
-  end component mux_16to4;
-
-  component display_controller is
-  port (
-    clk_i : in std_logic;
-    bcd_i : in bcd_array;
-    seg_o : out std_logic_vector(0 to 6);
-    anodos_o : out std_logic_vector(0 to 3)
-  );
-  end component display_controller;
-
-  component tp is
   port(
-    clk_i: in std_logic;
-    rst_i: in std_logic;
-    seg_o: out std_logic_vector(0 to 6);
-    anodos_o: out std_logic_vector(0 to 3)
+    char_idx_i: in std_logic_vector(3 downto 0);
+    font_row_i, font_col_i: in std_logic_vector(M-1 downto 0);
+    rom_o: out std_logic
   );
-  end component tp;
+  end component char_rom;
+
   -- End
 end common;
