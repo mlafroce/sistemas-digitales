@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+from sys import argv 
+import math
+
+import traceback
+import sys
+
+__doc__ = """
+Uso: {__file__} [-h/--help]
+"""
+
+class FloatingPoint:
+    def __init__(self, num = 0, numBits = 2, expBits = 1):
+        self.mantisaBits = (numBits - expBits - 1)
+        signMask = 1 << numBits - 1
+        expMask = int(pow(2,expBits) - 1)
+        mantisaMask = (1 << self.mantisaBits) - 1
+        self.sign = num & signMask != 0
+        self.exp = (num >> self.mantisaBits) & expMask
+        self.mantisa = num & mantisaMask
+        self.bias = (1 << (expBits - 1)) - 1
+        
+    def convertToDec(self):
+        normExp = self.exp - self.bias - self.mantisaBits
+        result = 0
+        tmpMantisa = self.mantisa
+        for _ in range (0, self.mantisaBits):
+            if (tmpMantisa % 2 != 0):
+                result += pow(2, normExp)
+            tmpMantisa = tmpMantisa // 2
+            normExp += 1
+        result += pow(2, normExp)
+        if (self.sign):
+            result = -result
+        return result
+
+    @staticmethod
+    def copy(fp):
+        c = FloatingPoint()
+        c.bias = fp.bias
+        c.exp = fp.exp
+        c.mantisa = fp.mantisa
+        c.mantisaBits = fp.mantisaBits
+        c.sign = fp.sign
+        return c
+
+    def sum(self, other):
+        # Paso 1: self tiene que tener el exponente mayor o igual a other
+        if self.exp < other.exp:
+            return other.sum(self)
+        result = FloatingPoint.copy(other)
+        result.exp = self.exp
+        print("Paso1 -> sumando : exp {0:>3} | {1:>2} | 1{2:0>16b}".format(self.exp, self.sign, self.mantisa))
+        print("Paso1 -> con     : exp {0:>3} | {1:>2} | 1{2:0>16b}".format(other.exp, other.sign, other.mantisa))
+        normalMantisaA = self.mantisa + (1 << self.mantisaBits)
+        result.mantisa = result.mantisa + (1 << self.mantisaBits)
+        # Paso 2: complemento a 2
+        resultComplemented = self.sign != other.sign
+        if resultComplemented:
+            result.mantisa = ~(result.mantisa)
+            result.mantisa = result.mantisa % (1 << self.mantisaBits)
+        else:
+            result.mantisa = result.mantisa
+        print("Paso2 -> sign: {0} - exp: {1} - mantisa: {2:>17b}".format(result.sign, result.exp, result.mantisa))
+        # Displacement es >= 0
+        displacement = self.exp - other.exp
+        # Paso 3: Calculo de bits grs
+        grsMask = (1 << displacement) - 1
+        grs = other.mantisa & grsMask
+        # Paso 3: Alinea B con A
+        print("Paso3 -> sign: {0} - exp: {1} - mantisa: {2:0>17b} Aplicando displacement".format(result.sign, result.exp, result.mantisa))
+        result.mantisa = result.mantisa >> displacement
+        # Paso 3: Si fue complementado, agrego los 1s
+        print("Paso3 -> sign: {0} - exp: {1} - mantisa: {2:0>17b} - displacement {3}".format(result.sign, result.exp, result.mantisa, displacement))
+        if resultComplemented:
+            pass
+            #result.mantisa |= grsMask << (self.mantisaBits - displacement)
+        print("Paso3 -> sign: {0} - exp: {1} - mantisa: {2:0>17b}".format(result.sign, result.exp, result.mantisa))
+        # Paso 4: A la mantisa de B le suma A
+        print("Paso4 -> sumando : exp {0:>16} | {1:0>17b}".format(self.exp, normalMantisaA))
+        print("Paso4 -> con     : exp {0:>16} | {1:0>17b}".format(result.exp, result.mantisa))
+        result.mantisa += normalMantisaA
+        #result.mantisa += 1 << self.mantisaBits
+        print("Carry? {0} ({0:0>17b}) {1} ({1:>17b})".format(result.mantisa, 1 << self.mantisaBits))
+        carryOut = result.mantisa >= (1 << self.mantisaBits + 1)
+        resultMsb = result.mantisa & (1 << (self.mantisaBits))
+        result.mantisa = result.mantisa % (1 << self.mantisaBits)
+        print("Paso4 -> sign: {0} - exp: {1} - mantisa: {2:>17b} - carry: {3} - msb: {4}".format(result.sign, result.exp, result.mantisa, carryOut, resultMsb))
+        # Verifico si hay que complementar
+        if resultComplemented and resultMsb != 0 and not carryOut:
+            result.mantisa = ~result.mantisa
+            result.mantisa = result.mantisa % (1 << self.mantisaBits)
+        print("Paso4 -> sign: {0} - exp: {1} - mantisa: {2:>17b} ({2})".format(result.sign, result.exp, result.mantisa))
+        # Paso 5 desplazo a la derecha si son signos iguales y hay carry: 
+        if not resultComplemented and carryOut:
+            print("Carry!: 1{0:0>16b}".format(result.mantisa))
+            result.mantisa = result.mantisa >> 1
+            result.mantisa += 1 << self.mantisaBits
+            result.exp += 1
+        else:
+            # Me quedo con los bits de la mantisa
+            if result.mantisa == 0:
+                return result
+            grsUsed = False
+            if not resultMsb:
+                grsUsed = True
+                print("Paso5 (first normalization) -> sign: {0} - exp: {1} - mantisa: 1{2:0>16b}".format(result.sign, result.exp, result.mantisa))
+                result.mantisa = result.mantisa << 1
+                # Le agrego el bit grs
+                result.mantisa += (grs >> displacement - 1)
+                result.exp -= 1
+            # recalculo msb
+            resultMsb = result.mantisa & (1 << self.mantisaBits)
+            print("Paso5 (normalize) -> msb? {0} & {1}".format(result.mantisa, (1 << self.mantisaBits)))
+            # normalizo
+            print("Paso5 (normalize) -> sign: {0} - exp: {1} - mantisa: {2}(1{2:0>16b})".format(result.sign, result.exp, result.mantisa))
+            while not resultMsb :
+                print("Adjusting")
+                result.mantisa = result.mantisa << 1
+                resultMsb = result.mantisa & (1 << self.mantisaBits)
+                result.exp -= 1
+            if grsUsed:
+                result.exp += 1
+                result.mantisa >>= 1
+        mantisaMask = (1 << (self.mantisaBits)) - 1
+        result.mantisa = result.mantisa & mantisaMask
+        print("Paso5 (normalized) -> sign: {0} - exp: {1} - mantisa: {2}(1{2:0>16b})".format(result.sign, result.exp, result.mantisa))
+        return result
+
+
+def processLine(line, numBits, expBits):
+    nums = line.split(' ')
+    if len(nums) != 3:
+        print("Numero incorrecto de parametros")
+        raise
+    nums = [int(i) for i in nums]
+    print("Leido {0} -> {0:0>{3}b}, {1} -> {1:0>{3}b}, {2} -> {2:0>{3}b}".format(*nums, numBits))
+    a = FloatingPoint(nums[0], numBits, expBits)
+    b = FloatingPoint(nums[1], numBits, expBits)
+    resExp = FloatingPoint(nums[2], numBits, expBits)
+    result = a.sum(b)
+    print("A = {0}, B = {1}, Result = {2}, Exp = {3}".format(a.convertToDec(), b.convertToDec(), result.convertToDec(),resExp.convertToDec()))
+    print("A -> sign:        {0} - exp: {1} - mantisa: {2} (1{2:0>16b})".format(a.sign, a.exp, a.mantisa))
+    print("B -> sign:        {0} - exp: {1} - mantisa: {2} (1{2:0>16b})".format(b.sign, b.exp, b.mantisa))
+    print("Result   -> sign: {0} - exp: {1} - mantisa: {2} (1{2:0>16b})".format(result.sign, result.exp, result.mantisa))
+    print("Expected -> sign: {0} - exp: {1} - mantisa: {2} (1{2:0>16b})\n".format(resExp.sign, resExp.exp, resExp.mantisa))
+
+#A  : 00000000000111101101101
+#B  : 00000000101000111111000
+#Res: 00000001100001011001011
+#Exp: 00000001010000101100101
+
+if __name__ == '__main__':
+    if '-h' in argv or '--help' in argv:
+        print(__doc__)
+        exit(0)
+    elif len(argv) != 2:
+        print(__doc__)
+        exit(1)
+
+    with open(argv[1]) as inputFile:
+        for line in inputFile:
+            try:
+                processLine(line, 23, 6)
+            except Exception as e:
+                traceback.print_exc(file=sys.stdout)
+                print (e)
+                print ('Error: Linea "{}" invalida'.format(line))
+
+
+# 3 bits de exp: bias = (2^(3-1)) - 1 = 3
+# num_a = '0'+'011'+'1110' = - (3-3) * 1.1110
+# num_b = '1'+'100'+'1001' = - (4-3) * 1.1001 | 11001 = 25 = -7 => 1.1001
+# uso num_b, complemento a 2 de la mantisa
+# res_mantisa = 00111
+
+
+# num_a = '0'+'100'+'1001' = - (4-3) * 1.1001 | 11001 = 25 => 1.1001 = 25 / 16 = 1 + 9/16 = 1.5625
+# num_b = '1'+'100'+'1001' = - (4-3) * 1.1001
+
+# complemento a 2 la mantisa => 0.0110 + 1 = 0.0111
+# 1.1001 
+#+0.0111
+# 0.0000
+#10000000000000000
