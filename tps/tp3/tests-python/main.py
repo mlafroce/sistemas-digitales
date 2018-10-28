@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from sys import argv 
-from floatPoint.floatPointStep01 import FloatingPoint
+from floatPoint.floatPointStep02 import FloatingPoint
 import math
 
 import traceback
@@ -22,8 +22,8 @@ def processLine(line, numBits, expBits):
     resExp = FloatingPoint(nums[2], numBits, expBits)
     result = a.sum(b)
     print("A = {0}, B = {1}, Result = {2}, Exp = {3}".format(a.convertToDec(), b.convertToDec(), result.convertToDec(),resExp.convertToDec()))
-    print("A -> sign:        {0} - exp: {1} - mantisa: {2} (1{2:0>16b})".format(a.sign, a.exp, a.mantisa))
-    print("B -> sign:        {0} - exp: {1} - mantisa: {2} (1{2:0>16b})".format(b.sign, b.exp, b.mantisa))
+    print("A -> sign:        {0:1>} - exp: {1} - mantisa: {2} (1{2:0>16b})".format(a.sign, a.exp, a.mantisa))
+    print("B -> sign:        {0:1>} - exp: {1} - mantisa: {2} (1{2:0>16b})".format(b.sign, b.exp, b.mantisa))
     print("Result   -> sign: {0} - exp: {1} - mantisa: {2} (1{2:0>16b})".format(result.sign, result.exp, result.mantisa))
     print("Expected -> sign: {0} - exp: {1} - mantisa: {2} (1{2:0>16b})\n".format(resExp.sign, resExp.exp, resExp.mantisa))
 

@@ -57,7 +57,7 @@ class FloatingPoint:
         # Paso 2: complemento a 2
         resultComplemented = self.sign != other.sign
         if resultComplemented:
-            result.mantisa = ~(result.mantisa)
+            result.mantisa = -result.mantisa
             result.mantisa = result.mantisa % (1 << self.mantisaBits)
         else:
             result.mantisa = result.mantisa

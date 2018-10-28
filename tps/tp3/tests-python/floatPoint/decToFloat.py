@@ -21,6 +21,7 @@ class Converter:
         sign = 0
         if num < 0:
             sign = 1 << (self.numBits - 1)
+            num = -num
         exp = self.bias
         if num > 1:
             while num >= 2:

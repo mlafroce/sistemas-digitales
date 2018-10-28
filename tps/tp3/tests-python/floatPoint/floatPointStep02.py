@@ -7,9 +7,9 @@ import sys
 
 class FloatingPoint:
     """
-    Iteración 1 de la clase punto flotante
-    En esta iteración se pueden multiplicar números de punto flotante, pero
-    solo se pueden sumar números positivos. 
+    Iteración 2 de la clase punto flotante
+    En esta iteración se pueden sumar números de distinto signo
+    Se ignoran los bits de gsr
     """
     def __init__(self, num = 0, numBits = 2, expBits = 1):
         self.mantisaBits = (numBits - expBits - 1)
@@ -69,27 +69,36 @@ class FloatingPoint:
         if self.exp < other.exp:
             return other.sum(self)
         result = other.clone()
-        # Asigno exponente tentativo el sumando A
+        # Asigno como exponente y signo tentativos el del sumando A
         result.exp = self.exp
+        result.sign = self.sign
+        # Avance de paso 4, 
+        otherHiddenBit = 1 << result.mantisaBits
+        result.mantisa += otherHiddenBit
         # Paso 2 complemento si son signos opuestos
-        resultComplemented = self.sign != other.sign
-        if resultComplemented:
-            pass
+        otherComplemented = self.sign != other.sign
+        if otherComplemented:
+            result.mantisa = -result.mantisa
         # Paso 3
         # Displacement es >= 0
         displacement = self.exp - other.exp
         # Agrego los que van al principio de la mantisa
         result.mantisa = result.mantisa >> displacement
-        otherHiddenBit = 1 << (result.mantisaBits - displacement)
-        result.mantisa += otherHiddenBit
+        # Paso 4, la suma
         selfHiddenBit = 1 << (self.mantisaBits)
-        # Paso 4
         result.mantisa += self.mantisa
         result.mantisa += selfHiddenBit
         # Paso 5
         carryOut = result.mantisa >= (1 << self.mantisaBits + 1)
         resultMsb = result.mantisa & (1 << (self.mantisaBits))
-        if not resultComplemented and carryOut:
+        # Paso 4, cambio de signo
+        resultComplemented = False
+        if otherComplemented and resultMsb and not carryOut:
+            resultComplemented = True
+            result.mantisa = -result.mantisa
+            resultMsb = result.mantisa & (1 << (self.mantisaBits))
+        # Vuelvo al paso 5
+        if not otherComplemented and carryOut:
             result.mantisa = result.mantisa >> 1
             result.mantisa += 1 << self.mantisaBits
             result.exp += 1
@@ -97,11 +106,13 @@ class FloatingPoint:
             # Me quedo con los bits de la mantisa
             if result.mantisa == 0:
                 return result
-            # normalizo (no hay mucho que normalizar siendo suma de positivos)
+            # normalizo
             while not resultMsb :
                 result.mantisa = result.mantisa << 1
                 resultMsb = result.mantisa & (1 << self.mantisaBits)
                 result.exp -= 1
-        mantisaModulo = (1 << (self.mantisaBits))
-        result.mantisa = result.mantisa % mantisaModulo
+        result.mantisa %= (1 << self.mantisaBits)
+        # Paso 8
+        if resultComplemented:
+            result.sign = not result.sign
         return result
