@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-from sys import argv 
-import math
-
-import traceback
-import sys
 
 class FloatingPoint:
     """
@@ -89,8 +84,8 @@ class FloatingPoint:
         result.mantisa += self.mantisa
         result.mantisa += selfHiddenBit
         # Paso 5
-        carryOut = result.mantisa >= (1 << self.mantisaBits + 1)
-        resultMsb = result.mantisa & (1 << (self.mantisaBits))
+        carryOut = result.mantisa >= (1 << self.mantisaBits)
+        resultMsb = result.mantisa & (1 << (self.mantisaBits - 1))
         # Paso 4, cambio de signo
         resultComplemented = False
         if otherComplemented and resultMsb and not carryOut:
